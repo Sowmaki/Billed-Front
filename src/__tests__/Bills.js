@@ -2,11 +2,11 @@
  * @jest-environment jsdom
  */
 
-import {screen, waitFor} from "@testing-library/dom"
-import BillsUI from "../views/BillsUI.js"
-import { bills } from "../fixtures/bills.js"
-import { ROUTES_PATH} from "../constants/routes.js";
-import {localStorageMock} from "../__mocks__/localStorage.js";
+import { screen, waitFor } from "@testing-library/dom";
+import { localStorageMock } from "../__mocks__/localStorage.js";
+import { ROUTES_PATH } from "../constants/routes.js";
+import { bills } from "../fixtures/bills.js";
+import BillsUI from "../views/BillsUI.js";
 
 import router from "../app/Router.js";
 
@@ -29,9 +29,13 @@ describe("Given I am connected as an employee", () => {
 
     })
     test("Then bills should be ordered from earliest to latest", () => {
+      // crée l'interface utilisateur avec les factures (bills) passées en paramètre.
       document.body.innerHTML = BillsUI({ data: bills })
+      // récupère tous les éléments contenant une date au format YYYY-MM-DD, YYYY/MM/DD ou YYYY.MM.DD
       const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML)
+      // Trie les dates du plus récent au plus ancien (ex : 2024-03-10 avant 2023-05-12).
       const antiChrono = (a, b) => ((a < b) ? 1 : -1)
+      // Crée copie triée de dates selon antiChrono. 
       const datesSorted = [...dates].sort(antiChrono)
       expect(dates).toEqual(datesSorted)
     })
