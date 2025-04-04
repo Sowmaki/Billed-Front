@@ -37,7 +37,7 @@ describe("Given I am connected as an employee", () => {
       expect(newBill.fileName).toBe("facture.jpg")
     })
 
-    test("Throw Error if file format is not valid", () => {
+    test("If file format is not valid, then I am invited to put a valid file", () => {
       window.alert = jest.fn()
       const newBill = new NewBill({ document, onNavigate: jest.fn(), store: mockStore, localStorage: window.localStorage })
 
@@ -50,7 +50,7 @@ describe("Given I am connected as an employee", () => {
       expect(fileInput.value).toBe("")
     })
 
-    test("Submit form with valid data", async () => {
+    test("Then I can submit form with valid data", async () => {
       // document.body.innerHTML = NewBillUI()
       const onNavigate = jest.fn()
       const newBill = new NewBill({ document, onNavigate, store: mockStore, localStorage: window.localStorage })
