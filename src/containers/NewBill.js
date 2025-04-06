@@ -18,21 +18,21 @@ export default class NewBill {
 
   handleChangeFile = e => {
     e.preventDefault()
-    const file = this.document.querySelector(`input[data-testid="file"]`).files[0] // Selectionne l'input avec le data-testid "file"
-    const fileName = file.name// On recupère le nom du fichier dans le chemin selectionnée
+    const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
+    const fileName = file.name
     this.fileName = fileName
-    const formData = new FormData() // On crée un objet FormData
-    const email = JSON.parse(localStorage.getItem("user")).email //On récupère l'email de l'utilisateur connecté
+    const formData = new FormData()
+    const email = JSON.parse(localStorage.getItem("user")).email
 
     try {
       const allowedExtensions = ['jpg', 'jpeg', 'png'];
-      const fileExtension = fileName.split('.').pop().toLowerCase(); // On récupère l'extension du fichier
+      const fileExtension = fileName.split('.').pop().toLowerCase();
 
       if (!allowedExtensions.includes(fileExtension)) {
-        this.document.querySelector(`input[data-testid="file"]`).value = ''; // Vide l'input si mauvais format
+        this.document.querySelector(`input[data-testid="file"]`).value = '';
 
-        alert('Seuls les formats jpg, jpeg et png sont pris en compte.') // Lance une alerte
-        throw new Error('Format de fichier non autorisé. Seuls les formats jpg, jpeg et png sont autorisés.'); // et jette l'erreur
+        alert('Seuls les formats jpg, jpeg et png sont pris en compte.')
+        throw new Error('Format de fichier non autorisé. Seuls les formats jpg, jpeg et png sont autorisés.');
       }
 
       formData.append('file', file)
