@@ -21,6 +21,8 @@ export default class {
   }
 
   handleClickIconEye = (icon) => {
+    debugger
+
     const billUrl = icon.getAttribute("data-bill-url")
     const imgWidth = Math.floor($('#modaleFile').width() * 0.5)
     $('#modaleFile').find(".modal-body").html(`<div style='text-align: center;' class="bill-proof-container"><img width=${imgWidth} src=${billUrl} alt="Bill" /></div>`)
@@ -54,6 +56,10 @@ export default class {
             })
           console.log('length', bills.length)
           return bills
+        })
+        .catch(error => {
+          console.error(error) // <-- c'est ici que le test va taper
+          return []
         })
     }
   }

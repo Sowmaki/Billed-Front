@@ -11,40 +11,46 @@ import Bills from "../containers/Bills.js";
 import { bills } from "../fixtures/bills.js";
 import BillsUI from "../views/BillsUI.js";
 
-jest.mock("../app/store", () => mockStore)
+jest.mock("../app/store", () => mockStore);
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
+
+
     test("Then bill icon in vertical layout should be highlighted", async () => {
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+      window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }));
 
-      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-      window.localStorage.setItem('user', JSON.stringify({
-        type: 'Employee'
-      }))
-      const root = document.createElement("div")
-      root.setAttribute("id", "root")
-      document.body.append(root)
-      router()
-      window.onNavigate(ROUTES_PATH.Bills)
-      await waitFor(() => screen.getByTestId('icon-window'))
-      const windowIcon = screen.getByTestId('icon-window')
-      expect(windowIcon.classList.contains('active-icon')).toBeTruthy()
+      const root = document.createElement("div");
+      root.setAttribute("id", "root");
+      document.body.append(root);
 
-    })
+      router(); // Initialise le routeur
+      window.onNavigate(ROUTES_PATH.Bills);
+
+      await waitFor(() => screen.getByTestId('icon-window'));
+      const windowIcon = screen.getByTestId('icon-window');
+      expect(windowIcon.classList.contains('active-icon')).toBeTruthy();
+    });
+
+    // FACTURES TRIEES
     test("Then bills should be ordered from earliest to latest", () => {
-      document.body.innerHTML = BillsUI({ data: bills })
-      const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML)
-      const antiChrono = (a, b) => ((a < b) ? 1 : -1)
-      const datesSorted = [...dates].sort(antiChrono)
-      expect(dates).toEqual(datesSorted)
-    })
+      document.body.innerHTML = BillsUI({ data: bills });
 
+      const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML);
+      const antiChrono = (a, b) => ((a < b) ? 1 : -1);
+      const datesSorted = [...dates].sort(antiChrono);
+
+      expect(dates).toEqual(datesSorted);
+    });
+
+    // HANDLECLICKICONEYE
     describe('When I click on IconEye ', () => {
       test('should open the modal with the bill image', () => {
-        const icon = document.createElement('div')
+        const icon = document.createElement('div');
         icon.setAttribute('data-bill-url', 'https://fakeurl.com/bill.jpg');
 
-        $.fn.modal = jest.fn(); //mock de la fonction modal
+        $.fn.modal = jest.fn();
         const modal = document.createElement('div');
         modal.setAttribute('id', 'modaleFile');
         modal.innerHTML = '<div class="modal-body"></div>';
@@ -55,50 +61,46 @@ describe("Given I am connected as an employee", () => {
 
         const modalBody = document.querySelector('.modal-body');
         expect(modalBody.innerHTML).toContain('https://fakeurl.com/bill.jpg');
-        expect($.fn.modal).toHaveBeenCalledWith('show')
+        expect($.fn.modal).toHaveBeenCalledWith('show');
       });
-    })
+    });
 
-
+    // HANDLECLICKNEWBILL
     describe('When I click on new bill button', () => {
       test(('Then, I should be sent to newBill page'), () => {
         const daBills = [{
-          "id": "47qAXb6fIm2zOKkLzMro",
-          "vat": "80",
-          "fileUrl": "https://test.storage.tld/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a",
-          "status": "pending",
-          "type": "Hôtel et logement",
-          "commentary": "séminaire billed",
-          "name": "encore",
-          "fileName": "preview-facture-free-201801-pdf-1.jpg",
-          "date": "2004-04-04",
-          "amount": 400,
-          "commentAdmin": "ok",
-          "email": "a@a",
-          "pct": 20,
-        }]
+          id: "47qAXb6fIm2zOKkLzMro",
+          date: "2004-04-04",
+          name: "encore",
+          fileName: "preview-facture-free-201801-pdf-1.jpg",
+          amount: 400,
+          vat: "80",
+          pct: 20,
+          status: "pending",
+          email: "a@a"
+        }];
 
         const onNavigate = (pathname) => {
-          document.body.innerHTML = ROUTES({ pathname })
-        }
+          document.body.innerHTML = ROUTES({ pathname });
+        };
 
-        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-        window.localStorage.setItem('user', JSON.stringify({
-          type: 'Employee'
-        }))
+        Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+        window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }));
 
-        const bills = new Bills({ document, onNavigate, localStorage })
-        const handleClick = jest.fn(bills.handleClickNewBill.bind(bills))
-        document.body.innerHTML = BillsUI({ data: daBills })
+        const bills = new Bills({ document, onNavigate, localStorage });
+        const handleClick = jest.fn(bills.handleClickNewBill.bind(bills));
 
-        const btnNewBill = screen.getByTestId('btn-new-bill')
+        document.body.innerHTML = BillsUI({ data: daBills });
+
+        const btnNewBill = screen.getByTestId('btn-new-bill');
         btnNewBill.addEventListener("click", handleClick);
 
         fireEvent.click(btnNewBill);
         expect(handleClick).toHaveBeenCalled();
-      })
-    })
+      });
+    });
 
+    // GETBILLS
     describe("When API data is corrupted", () => {
       beforeEach(() => {
         jest.spyOn(mockStore, "bills");
@@ -111,6 +113,7 @@ describe("Given I am connected as an employee", () => {
       test("date format is not valid, log the error and return unformatted date", async () => {
         const consoleErrorSpy = jest.spyOn(console, "log").mockImplementation(() => { });
 
+        // Mocke une réponse contenant une date invalide
         mockStore.bills.mockImplementationOnce(() => {
           return {
             list: () => Promise.resolve([{
@@ -132,22 +135,40 @@ describe("Given I am connected as an employee", () => {
         });
 
         window.onNavigate(ROUTES_PATH.Bills);
-        await new Promise(process.nextTick); // Attendre la fin de l'exécution des promesses
+        await new Promise(process.nextTick);
 
-        // S'assurer que la date est bien affichée non-formatée
         const message = await screen.getByText(/fakeDate/);
         expect(message).toBeTruthy();
 
-        // S'assurer que la console log bien l'erreur
         expect(consoleErrorSpy).toHaveBeenCalled();
         expect(consoleErrorSpy.mock.calls[0][1]).toBe("for", expect.objectContaining({ date: "fakeDate" }));
-
       });
 
+      test("should log 400 error and return empty list", async () => {
+        const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+
+        mockStore.bills.mockImplementationOnce(() => ({
+          list: () => Promise.reject(new Error("Erreur 400")),
+        }));
+
+        window.onNavigate(ROUTES_PATH.Bills);
+        await new Promise(process.nextTick);
+
+        expect(consoleSpy).toHaveBeenCalledWith(new Error("Erreur 400"));
+      });
+
+      test("should log 500 error and return empty list", async () => {
+        const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+
+        mockStore.bills.mockImplementationOnce(() => ({
+          list: () => Promise.reject(new Error("Erreur 500")),
+        }));
+
+        window.onNavigate(ROUTES_PATH.Bills);
+        await new Promise(process.nextTick);
+
+        expect(consoleSpy).toHaveBeenCalledWith(new Error("Erreur 500"));
+      });
     });
-
-
-  })
-
+  });
 });
-
