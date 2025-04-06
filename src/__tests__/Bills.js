@@ -40,22 +40,24 @@ describe("Given I am connected as an employee", () => {
     })
 
     describe('When I click on IconEye ', () => {
-      const icon = document.createElement('div')
-      icon.setAttribute('data-bill-url', 'https://fakeurl.com/bill.jpg');
+      test('should open the modal with the bill image', () => {
+        const icon = document.createElement('div')
+        icon.setAttribute('data-bill-url', 'https://fakeurl.com/bill.jpg');
 
-      $.fn.modal = jest.fn(); //mock de la fonction modal
-      const modal = document.createElement('div');
-      modal.setAttribute('id', 'modaleFile');
-      modal.innerHTML = '<div class="modal-body"></div>';
-      document.body.append(modal);
+        $.fn.modal = jest.fn(); //mock de la fonction modal
+        const modal = document.createElement('div');
+        modal.setAttribute('id', 'modaleFile');
+        modal.innerHTML = '<div class="modal-body"></div>';
+        document.body.append(modal);
 
-      const billsInstance = new Bills({ document, onNavigate: jest.fn(), store: mockStore, localStorage: window.localStorage });
-      billsInstance.handleClickIconEye(icon);
+        const billsInstance = new Bills({ document, onNavigate: jest.fn(), store: mockStore, localStorage: window.localStorage });
+        billsInstance.handleClickIconEye(icon);
 
-      const modalBody = document.querySelector('.modal-body');
-      expect(modalBody.innerHTML).toContain('https://fakeurl.com/bill.jpg');
-      expect($.fn.modal).toHaveBeenCalledWith('show')
-    });
+        const modalBody = document.querySelector('.modal-body');
+        expect(modalBody.innerHTML).toContain('https://fakeurl.com/bill.jpg');
+        expect($.fn.modal).toHaveBeenCalledWith('show')
+      });
+    })
 
 
     describe('When I click on new bill button', () => {
