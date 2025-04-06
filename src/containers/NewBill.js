@@ -26,7 +26,7 @@ export default class NewBill {
 
     try {
       const allowedExtensions = ['jpg', 'jpeg', 'png'];
-      const fileExtension = file.name.split('.').pop().toLowerCase(); // On récupère l'extension du fichier
+      const fileExtension = fileName.split('.').pop().toLowerCase(); // On récupère l'extension du fichier
 
       if (!allowedExtensions.includes(fileExtension)) {
         this.document.querySelector(`input[data-testid="file"]`).value = ''; // Vide l'input si mauvais format
@@ -35,7 +35,7 @@ export default class NewBill {
         throw new Error('Format de fichier non autorisé. Seuls les formats jpg, jpeg et png sont autorisés.'); // et jette l'erreur
       }
 
-      formData.append('file', file)    // Ajoute les données email et utilisateur à l'objet formdata
+      formData.append('file', file)
       formData.append('email', email)
 
       this.store
@@ -45,19 +45,16 @@ export default class NewBill {
           headers: {
             noContentType: true
           }
-        })                                        //On envoie les données de formdata au backend
+        })
         .then(({ fileUrl, key }) => {
           console.log(fileUrl)
           this.billId = key
           this.fileUrl = fileUrl
           this.fileName = fileName
         }).catch(error => console.error(error))
-      // La reponse de l'API nous renverra l'URL du fichier stocké, l'identifiant de la facture
-      // Cette reponse sera stockée dans this.billId, this.fileUrl et this.filename
-      // Si erreur, on affiche dans la console
 
     } catch (error) {
-      console.error(error.message); // attrape toutes les erreurs possibles et les log dans la cpnsole
+      console.error(error.message);
     }
   }
 
