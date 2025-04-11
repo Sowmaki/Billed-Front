@@ -92,3 +92,6 @@ mot de passe : admin
 utilisateur : employee@test.tld
 mot de passe : employee
 ```
+###  Tech stack
+
+JavaScript | Node.js | Jest | Chrome Debugger |HTML/CSS/Sass
